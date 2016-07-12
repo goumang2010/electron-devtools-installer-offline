@@ -1,9 +1,10 @@
-import electron, { remote } from 'electron';
+import electron, {remote} from 'electron';
 import fs from 'fs';
 import path from 'path';
 
 import downloadChromeExtension from './downloadChromeExtension';
-import { getPath } from './utils';
+import offlineChromeExtension from './offlineChromeExtension';
+import {getPath} from './utils';
 
 let IDMap = {};
 const IDMapPath = path.resolve(getPath(), 'IDMap.json');
@@ -13,24 +14,24 @@ if (fs.existsSync(IDMapPath)) {
 
 export default (chromeStoreID, forceDownload = false) => {
   if (
-    !forceDownload &&
-    IDMap[chromeStoreID] &&
-    (remote || electron).BrowserWindow.getDevToolsExtensions &&
-    (remote || electron).BrowserWindow.getDevToolsExtensions().hasOwnProperty(IDMap[chromeStoreID])
-  ) {
-    return Promise.resolve(IDMap[chromeStoreID]);
-  }
-  return downloadChromeExtension(chromeStoreID, forceDownload)
-    .then((extensionFolder) => {
-      const name = (remote || electron).BrowserWindow.addDevToolsExtension(extensionFolder); // eslint-disable-line
-      fs.writeFileSync(
+      !forceDownload &&
+      IDMap[chromeStoreID] &&
+      (remote || electron).BrowserWindow.getDevToolsExtensions &&
+      (remote || electron).BrowserWindow.getDevToolsExtensions().hasOwnProperty(IDMap[chromeStoreID])
+  ) return Promise.resolve(IDMap[chromeStoreID]);
+
+  let promise = forceDownload ? downloadChromeExtension(chromeStoreID) : offlineChromeExtension(chromeStoreID);
+
+  return promise.then((extensionFolder) => {
+    const name = (remote || electron).BrowserWindow.addDevToolsExtension(extensionFolder); // eslint-disable-line
+    fs.writeFileSync(
         IDMapPath,
         JSON.stringify(Object.assign(IDMap, {
-          [chromeStoreID]: name,
+          [chromeStoreID]: name
         }))
-      );
-      return Promise.resolve(name);
-    });
+    );
+    return Promise.resolve(name);
+  });
 };
 
 export const EMBER_INSPECTOR = 'bmdblncegkenkacieihfhpjfppoconhi';
