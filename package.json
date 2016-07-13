@@ -22,7 +22,8 @@
     "electron-prebuilt": "^1.2.1"
   },
   "dependencies": {
-    "cross-zip": "^2.1.4",
+    "7zip": "0.0.6",
+    "cross-unzip": "0.0.2",
     "request": "^2.72.0",
     "rimraf": "^2.5.2"
   },

@@ -1,36 +1,46 @@
 import electron, {remote} from 'electron';
 import fs from 'fs';
 import path from 'path';
+import unzip from 'cross-unzip';
+import rimraf from 'rimraf';
 
 import downloadChromeExtension from './downloadChromeExtension';
 import offlineChromeExtension from './offlineChromeExtension';
-import {getPath} from './utils';
-
-let IDMap = {};
-const IDMapPath = path.resolve(getPath(), 'IDMap.json');
-if (fs.existsSync(IDMapPath)) {
-  IDMap = JSON.parse(fs.readFileSync(IDMapPath, 'utf8'));
-}
+import {checkConfig, getPath, getIDMapPath} from './utils';
 
 export default (chromeStoreID, forceDownload = false) => {
-  if (
-      !forceDownload &&
-      IDMap[chromeStoreID] &&
-      (remote || electron).BrowserWindow.getDevToolsExtensions &&
-      (remote || electron).BrowserWindow.getDevToolsExtensions().hasOwnProperty(IDMap[chromeStoreID])
-  ) return Promise.resolve(IDMap[chromeStoreID]);
 
-  let promise = forceDownload ? downloadChromeExtension(chromeStoreID) : offlineChromeExtension(chromeStoreID);
+  return checkConfig().then(function(IDMap) {
+    if (IDMap[chromeStoreID]
+        && (remote || electron).BrowserWindow.getDevToolsExtensions
+        && (remote || electron).BrowserWindow.getDevToolsExtensions().hasOwnProperty(IDMap[chromeStoreID]))
+      return Promise.resolve(IDMap[chromeStoreID]);
 
-  return promise.then((extensionFolder) => {
-    const name = (remote || electron).BrowserWindow.addDevToolsExtension(extensionFolder); // eslint-disable-line
-    fs.writeFileSync(
-        IDMapPath,
-        JSON.stringify(Object.assign(IDMap, {
-          [chromeStoreID]: name
-        }))
-    );
-    return Promise.resolve(name);
+    let promise = forceDownload ? downloadChromeExtension(chromeStoreID) : offlineChromeExtension(chromeStoreID);
+
+    return promise.then((extensionPath) => {
+      const extensionsStore = getPath();
+      const extensionFolder = path.resolve(`${extensionsStore}/${chromeStoreID}`);
+      rimraf.sync(extensionFolder);
+
+      return new Promise(function(resolve, reject) {
+        unzip(extensionPath, extensionFolder, (err) => {
+          if (err) reject(err);
+          else {
+            const name = (remote || electron).BrowserWindow.addDevToolsExtension(extensionFolder); // eslint-disable-line
+
+            fs.writeFile(getIDMapPath()
+                , JSON.stringify(Object.assign(IDMap, {
+                  [chromeStoreID]: name
+                }))
+                , err => {
+                  if (err) reject(err);
+                  else resolve(extensionFolder);
+                });
+          }
+        });
+      });
+    });
   });
 };
 
