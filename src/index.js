@@ -1,7 +1,7 @@
 import electron, {remote} from 'electron';
 import fs from 'fs';
 import path from 'path';
-import unzip from 'cross-unzip';
+import zipkit from 'node-zipkit';
 import rimraf from 'rimraf';
 
 import downloadChromeExtension from './downloadChromeExtension';
@@ -29,7 +29,7 @@ const installExtension = (chromeStoreID, forceDownload = false) => {
         rimraf.sync(extensionFolder);
 
         return new Promise(function(resolve, reject) {
-          unzip(extensionPath, extensionFolder, (err) => {
+          zipkit.unzip(extensionPath, extensionFolder, (err) => {
             if (err) reject(err);
             else {
               const name = (remote || electron).BrowserWindow.addDevToolsExtension(extensionFolder); // eslint-disable-line

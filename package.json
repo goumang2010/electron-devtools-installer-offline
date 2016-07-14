@@ -6,7 +6,10 @@
   "scripts": {
     "compile": "babel src --out-dir dist"
   },
-  "files": ["dist/*", "extensions/*"],
+  "files": [
+    "dist/*",
+    "extensions/*"
+  ],
   "keywords": [
     "electron",
     "dev",
@@ -22,8 +25,7 @@
     "electron-prebuilt": "^1.2.1"
   },
   "dependencies": {
-    "7zip": "0.0.6",
-    "cross-unzip": "0.0.2",
+    "node-zipkit": "^0.1.0",
     "request": "^2.72.0",
     "rimraf": "^2.5.2"
   },
