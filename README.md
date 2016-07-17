@@ -28,3 +28,7 @@ Install DevTool extensions into Electron.
 
 - `chromeStoreID` is ChromeStore ID of the extension
 - `forceDownload` set true will ignore the offline extensions files.
+
+**EMBER_INSPECTOR/REACT_DEVELOPER_TOOLS/ANGULARJS_BATARANG/VUEJS_DEVTOOLS/REDUX_DEVTOOLS**
+
+This DevToll extensions are all download already in extensions folder, so you can install these extensions offline.
