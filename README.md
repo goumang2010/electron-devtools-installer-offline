@@ -15,7 +15,7 @@ The `extensions` folder is store extensions file. When install extensions, will 
 ## Usage
 
 ```js
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer-offline';
 
 installExtension(REACT_DEVELOPER_TOOLS)
 ```
