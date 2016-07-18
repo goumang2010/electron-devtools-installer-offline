@@ -10,14 +10,26 @@ The `extensions` folder is store extensions file. When install extensions, will 
 
 ## Install
 
-    $ npm install electron-devtools-install-offline --save-dev
+    $ npm install electron-devtools-installer-offline --save-dev
 
 ## Usage
 
 ```js
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer-offline';
+import installExtension, {
+  REACT_DEVELOPER_TOOLS
+} from 'electron-devtools-installer-offline';
 
-installExtension(REACT_DEVELOPER_TOOLS)
+installExtension(REACT_DEVELOPER_TOOLS);
+```
+
+Support offline extensions, these extensions are all download already in extensions folder.
+
+```js
+import installExtension, {
+  EMBER_INSPECTOR, REACT_DEVELOPER_TOOLS,
+  ANGULARJS_BATARANG, VUEJS_DEVTOOLS,
+  REDUX_DEVTOOLS,
+} from 'electron-devtools-installer-offline';
 ```
 
 ## API
@@ -28,7 +40,3 @@ Install DevTool extensions into Electron.
 
 - `chromeStoreID` is ChromeStore ID of the extension
 - `forceDownload` set true will ignore the offline extensions files.
-
-**EMBER_INSPECTOR/REACT_DEVELOPER_TOOLS/ANGULARJS_BATARANG/VUEJS_DEVTOOLS/REDUX_DEVTOOLS**
-
-This DevToll extensions are all download already in extensions folder, so you can install these extensions offline.
