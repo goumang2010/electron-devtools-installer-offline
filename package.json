@@ -1,6 +1,6 @@
 {
   "name": "electron-devtools-offline",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "An easy way to install Dev Tools extensions into Electron applications",
   "main": "dist/index.js",
   "scripts": {
