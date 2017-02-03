@@ -8,14 +8,17 @@ import downloadChromeExtension from './downloadChromeExtension';
 import offlineChromeExtension from './offlineChromeExtension';
 import {checkConfig, getPath, getIDMapPath} from './utils';
 
+const {BrowserWindow} = remote || electron;
+
 const installExtension = (chromeStoreID, forceDownload = false) => {
   return checkConfig().then(function(IDMap) {
     if (IDMap[chromeStoreID]
-        && (remote || electron).BrowserWindow.getDevToolsExtensions
-        && (remote || electron).BrowserWindow.getDevToolsExtensions().hasOwnProperty(IDMap[chromeStoreID]))
+        && BrowserWindow.getDevToolsExtensions
+        && BrowserWindow.getDevToolsExtensions().hasOwnProperty(IDMap[chromeStoreID]))
       return Promise.resolve(IDMap[chromeStoreID]);
 
-    let promise = forceDownload ? downloadChromeExtension(chromeStoreID) : offlineChromeExtension(chromeStoreID);
+    // The BrowserWindow.addDevToolsExtension API cannot be called before the ready event of the app module is emitted.
+    let promise = forceDownload ? downloadChromeExtension(chromeStoreID) : new Promise((r,j) => { setTimeout(() =>{r(offlineChromeExtension(chromeStoreID))}, 5000)})
 
     return promise.then((extensionPath) => {
       const extensionsStore = getPath();
@@ -26,7 +29,7 @@ const installExtension = (chromeStoreID, forceDownload = false) => {
         unzip(extensionPath, extensionFolder, (err) => {
           if (err) reject(err);
           else {
-            const name = (remote || electron).BrowserWindow.addDevToolsExtension(extensionFolder); // eslint-disable-line
+            const name = BrowserWindow.addDevToolsExtension(extensionFolder); // eslint-disable-line
 
             fs.writeFile(getIDMapPath()
                 , JSON.stringify(Object.assign(IDMap, {
